@@ -1,0 +1,136 @@
+openapi: 3.0.3
+info:
+  title: Apiway API
+  version: 1.0.0
+  description: >
+    Public and admin surface exposed through the Apiway gateway. Business
+    endpoints (orders, catalog) are documented by their own services; this spec
+    covers authentication and the gateway's own endpoints.
+servers:
+  - url: http://localhost:8080
+paths:
+  /healthz:
+    get:
+      summary: Liveness/readiness probe
+      security: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: ok }
+  /metrics:
+    get:
+      summary: Prometheus metrics (text exposition format)
+      security: []
+      responses:
+        "200":
+          description: Metrics
+          content:
+            text/plain: {}
+  /auth/register:
+    post:
+      summary: Register a user and receive a token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TokenResponse" }
+        "409": { description: Username already exists }
+  /auth/login:
+    post:
+      summary: Authenticate and receive a token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TokenResponse" }
+        "401": { description: Invalid credentials }
+  /admin/routes:
+    get:
+      summary: Read the gateway routing table
+      description: Requires a JWT with the `admin:read` permission (or `*`).
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  routes:
+                    type: array
+                    items: { $ref: "#/components/schemas/Route" }
+        "401": { description: Missing or invalid token }
+        "403": { description: Missing admin permission }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string, minLength: 3 }
+        password: { type: string, minLength: 8 }
+        roles:
+          type: array
+          items: { type: string }
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string }
+        password: { type: string }
+    TokenResponse:
+      type: object
+      properties:
+        access_token: { type: string }
+        token_type: { type: string, example: Bearer }
+        expires_in: { type: integer, example: 3600 }
+        roles:
+          type: array
+          items: { type: string }
+        permissions:
+          type: array
+          items: { type: string }
+    Route:
+      type: object
+      properties:
+        path_prefix: { type: string }
+        upstream: { type: string }
+        auth: { type: boolean }
+        allow_api_key: { type: boolean }
+        strip_prefix: { type: boolean }
+        required_permissions:
+          type: array
+          items: { type: string }
+        method_permissions:
+          type: object
+          additionalProperties:
+            type: array
+            items: { type: string }
