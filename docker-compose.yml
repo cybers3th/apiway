@@ -1,0 +1,46 @@
+services:
+  gateway:
+    build: ./gateway
+    ports:
+      - "8080:8080"
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      - auth-service
+      - orders-service
+      - catalog-service
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  auth-service:
+    build: ./services/auth-service
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ISSUER: auth-service
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin-change-me}
+    expose:
+      - "9000"
+
+  orders-service:
+    build: ./services/orders-service
+    expose:
+      - "9100"
+
+  catalog-service:
+    build: ./services/catalog-service
+    expose:
+      - "9200"
+
+  dashboard:
+    build: ./dashboard
+    ports:
+      - "3000:80"
+    environment:
+      # The dashboard talks to the gateway; nginx proxies /api to it.
+      GATEWAY_URL: http://gateway:8080
+    depends_on:
+      - gateway
