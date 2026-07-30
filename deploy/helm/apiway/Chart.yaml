@@ -1,0 +1,16 @@
+apiVersion: v2
+name: apiway
+description: Polyglot API gateway and authentication platform
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - api-gateway
+  - authentication
+  - rbac
+  - reverse-proxy
+home: https://github.com/Anhedonicc/apiway
+sources:
+  - https://github.com/Anhedonicc/apiway
+maintainers:
+  - name: The Apiway Authors

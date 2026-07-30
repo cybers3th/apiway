@@ -1,0 +1,30 @@
+image:
+  registry: ghcr.io/Anhedonicc/apiway
+  tag: latest
+  pullPolicy: IfNotPresent
+
+jwt:
+  # Provide via --set jwt.secret=... or an existing secret (jwt.existingSecret).
+  secret: ""
+  existingSecret: ""
+  issuer: auth-service
+
+gateway:
+  replicas: 2
+  resources:
+    requests: { cpu: 50m, memory: 32Mi }
+    limits: { cpu: 500m, memory: 128Mi }
+  service:
+    port: 8080
+
+authService:
+  replicas: 1
+ordersService:
+  replicas: 1
+catalogService:
+  replicas: 1
+
+ingress:
+  enabled: false
+  className: nginx
+  host: apiway.example.com

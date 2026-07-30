@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: apiway
+  labels: { app: auth-service }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: auth-service }
+  template:
+    metadata:
+      labels: { app: auth-service }
+    spec:
+      containers:
+        - name: auth-service
+          image: ghcr.io/Anhedonicc/apiway/auth-service:latest
+          ports:
+            - containerPort: 9000
+          env:
+            - name: JWT_ISSUER
+              value: auth-service
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: apiway-secrets
+                  key: JWT_SECRET
+          readinessProbe:
+            httpGet: { path: /healthz, port: 9000 }
+          resources:
+            requests: { cpu: 50m, memory: 64Mi }
+            limits: { cpu: 500m, memory: 256Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: apiway
+spec:
+  selector: { app: auth-service }
+  ports:
+    - port: 9000
+      targetPort: 9000

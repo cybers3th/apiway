@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog-service
+  namespace: apiway
+  labels: { app: catalog-service }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: catalog-service }
+  template:
+    metadata:
+      labels: { app: catalog-service }
+    spec:
+      containers:
+        - name: catalog-service
+          image: ghcr.io/Anhedonicc/apiway/catalog-service:latest
+          ports:
+            - containerPort: 9200
+          readinessProbe:
+            httpGet: { path: /healthz, port: 9200 }
+          resources:
+            requests: { cpu: 50m, memory: 96Mi }
+            limits: { cpu: 500m, memory: 256Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog-service
+  namespace: apiway
+spec:
+  selector: { app: catalog-service }
+  ports:
+    - port: 9200
+      targetPort: 9200
