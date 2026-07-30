@@ -1,0 +1,26 @@
+# Secrets
+.env
+
+# C++ / CMake
+/gateway/build/
+*.o
+*.obj
+
+# .NET
+bin/
+obj/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Ruby
+.bundle/
+vendor/bundle/
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

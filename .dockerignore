@@ -1,0 +1,14 @@
+.git
+.github
+docs
+deploy
+monitoring
+scripts
+**/build
+**/bin
+**/obj
+**/node_modules
+**/__pycache__
+**/.venv
+.env
+*.md

@@ -1,0 +1,8 @@
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ico binary
+
+# Collapse vendored/generated content in diffs
+dashboard/package-lock.json linguist-generated=true
