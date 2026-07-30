@@ -1,0 +1,39 @@
+name: Bug report
+description: Report a defect in Apiway
+labels: [bug]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - gateway (C++)
+        - auth-service (Python)
+        - orders-service (C#)
+        - catalog-service (Ruby)
+        - dashboard (TypeScript)
+        - deployment / infra
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Include what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start the stack with `docker compose up`
+        2. curl ...
+        3. See error
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      render: shell

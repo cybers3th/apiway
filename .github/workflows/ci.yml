@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gateway:
+    name: Gateway (C++)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: sudo apt-get update && sudo apt-get install -y cmake g++
+      - name: Configure
+        run: cmake -S gateway -B gateway/build -DAPIWAY_BUILD_TESTS=ON
+      - name: Build
+        run: cmake --build gateway/build -j
+      - name: Test
+        run: cd gateway/build && ctest --output-on-failure
+
+  auth-service:
+    name: Auth service (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        working-directory: services/auth-service
+        run: |
+          pip install -r requirements.txt
+          pip install pytest ruff
+      - name: Lint
+        working-directory: services/auth-service
+        run: ruff check .
+      - name: Test
+        working-directory: services/auth-service
+        run: python -m pytest -q
+
+  catalog-service:
+    name: Catalog service (Ruby)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          working-directory: services/catalog-service
+          bundler-cache: true
+      - name: Syntax check
+        working-directory: services/catalog-service
+        run: ruby -c app.rb
+
+  orders-service:
+    name: Orders service (C#)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Build
+        working-directory: services/orders-service
+        run: dotnet build -c Release
+
+  dashboard:
+    name: Dashboard (TypeScript)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install
+        working-directory: dashboard
+        run: npm install --no-audit --no-fund
+      - name: Lint
+        working-directory: dashboard
+        run: npm run lint
+      - name: Build
+        working-directory: dashboard
+        run: npm run build
