@@ -1,0 +1,42 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "title": "Apiway Gateway",
+  "uid": "apiway-gateway",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Request rate by route",
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        {
+          "expr": "sum by (route) (rate(apiway_requests_total[1m]))",
+          "legendFormat": "{{route}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Denied requests by reason",
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        {
+          "expr": "sum by (reason) (rate(apiway_denied_total[1m]))",
+          "legendFormat": "{{reason}}"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Total handled",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 9 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [{ "expr": "apiway_handled_total" }]
+    }
+  ]
+}
