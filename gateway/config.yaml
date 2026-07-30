@@ -1,0 +1,48 @@
+server:
+  addr: ":8080"
+
+jwt:
+  secret_env: JWT_SECRET
+  issuer: auth-service
+
+rate_limit:
+  default:
+    rps: 20
+    burst: 40
+
+# Statically provisioned machine credentials. In production, back this with a
+# database or secret manager instead of the config file.
+api_keys:
+  - key: svc_catalog_reader_9f2c1a
+    name: reporting-bot
+    roles: [service]
+    permissions: [catalog:read]
+
+routes:
+  # Public: registration and login. No auth in front of the auth service.
+  - path_prefix: /auth
+    upstream: http://auth-service:9000
+    auth: false
+    rate_limit:
+      rps: 5
+      burst: 10
+
+  # Orders microservice (C#). Reading needs orders:read, writing orders:write.
+  - path_prefix: /api/orders
+    upstream: http://orders-service:9100
+    auth: true
+    required_permissions: [orders:read]
+    method_permissions:
+      POST: [orders:write]
+      PUT: [orders:write]
+      DELETE: [orders:write]
+    rate_limit:
+      rps: 10
+      burst: 20
+
+  # Catalog microservice (Ruby). Accepts either a JWT or a provisioned API key.
+  - path_prefix: /api/catalog
+    upstream: http://catalog-service:9200
+    auth: true
+    allow_api_key: true
+    required_permissions: [catalog:read]
