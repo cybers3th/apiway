@@ -14,7 +14,7 @@ jobs:
     name: Gateway (C++)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install toolchain
         run: sudo apt-get update && sudo apt-get install -y cmake g++
       - name: Configure
@@ -28,7 +28,7 @@ jobs:
     name: Auth service (Python)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -48,7 +48,7 @@ jobs:
     name: Catalog service (Ruby)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
@@ -62,7 +62,7 @@ jobs:
     name: Orders service (C#)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
@@ -74,7 +74,7 @@ jobs:
     name: Dashboard (TypeScript)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
